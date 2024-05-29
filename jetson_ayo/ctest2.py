@@ -97,6 +97,8 @@ if __name__ == "__main__":
             time.sleep(1)
     except KeyboardInterrupt:
         print("Interrupted by user, shutting down...")
+        
+# add block for logging to be parsed to JSON for writing to csv file, check which option fits best, whethe for ctest, ctest2, of inference.
     
     capture_thread.join()
     process_thread.join()
