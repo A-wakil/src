@@ -1,0 +1,9 @@
+gst-launch-1.0 nvarguscamerasrc sensor_id=0 ! 'video/x-raw(memory:NVMM),width=3280, height=2464, framerate=21/1, format=NV12' ! nvvidconv flip-method=2 ! 'video/x-raw, width=816, height=616' ! nvvidconv ! nvegltransform ! nveglglessink -e
+
+
+
+export PATH=${PATH}:/usr/local/cuda/bin
+
+gst-launch-1.0 uridecodebin uri=rtsp://127.0.0.1:8554/stream ! nvoverlaysink
+
+export ROBOFLOW_API_KEY=yxsWU7bMscq8Jcsv4qG0
