@@ -1,0 +1,2 @@
+Invoking command in '/home/abdul/slam_ws/build/articubot_one': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake /home/abdul/slam_ws/src/articubot_one -DCMAKE_INSTALL_PREFIX=/home/abdul/slam_ws/install/articubot_one
+Invoked command in '/home/abdul/slam_ws/build/articubot_one' returned '1': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake /home/abdul/slam_ws/src/articubot_one -DCMAKE_INSTALL_PREFIX=/home/abdul/slam_ws/install/articubot_one

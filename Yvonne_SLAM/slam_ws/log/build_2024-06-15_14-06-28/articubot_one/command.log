@@ -1,0 +1,6 @@
+Invoking command in '/home/abdul/slam_ws/build/articubot_one': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake /home/abdul/slam_ws/src/articubot_one-humble -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/abdul/slam_ws/install/articubot_one
+Invoked command in '/home/abdul/slam_ws/build/articubot_one' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake /home/abdul/slam_ws/src/articubot_one-humble -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/abdul/slam_ws/install/articubot_one
+Invoking command in '/home/abdul/slam_ws/build/articubot_one': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --build /home/abdul/slam_ws/build/articubot_one -- -j8 -l8
+Invoked command in '/home/abdul/slam_ws/build/articubot_one' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --build /home/abdul/slam_ws/build/articubot_one -- -j8 -l8
+Invoking command in '/home/abdul/slam_ws/build/articubot_one': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --install /home/abdul/slam_ws/build/articubot_one
+Invoked command in '/home/abdul/slam_ws/build/articubot_one' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --install /home/abdul/slam_ws/build/articubot_one

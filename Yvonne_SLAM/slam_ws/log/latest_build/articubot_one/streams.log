@@ -1,0 +1,3 @@
+[0.045s] Invoking command in '/home/abdul/slam_ws/build/articubot_one': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake /home/abdul/slam_ws/src/articubot_one -DCMAKE_INSTALL_PREFIX=/home/abdul/slam_ws/install/articubot_one
+[0.075s] [0mCMake Error: The source "/home/abdul/slam_ws/src/articubot_one/CMakeLists.txt" does not match the source "/home/abdul/slam_ws/src/articubot_one-humble/CMakeLists.txt" used to generate cache.  Re-run cmake with a different source directory.[0m
+[0.081s] Invoked command in '/home/abdul/slam_ws/build/articubot_one' returned '1': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake /home/abdul/slam_ws/src/articubot_one -DCMAKE_INSTALL_PREFIX=/home/abdul/slam_ws/install/articubot_one
