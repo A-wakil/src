@@ -3,7 +3,7 @@
 # For SLAM
 - **Using ros2 humble**
 - **mkdir slam work space (slam_ws) or clone the repo and use the folder from the repo(slam_ws)**
--
+  
 If you're using the repo slam workspace, delete every other folder from the workspace except from the src folder when it's on your device and run `colcon build --symlink-install` in the directory. If you made a new workspace, copy the src folder into it and run `colcon build --symlink-install`
 
 # *Install the following*
