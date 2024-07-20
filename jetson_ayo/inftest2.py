@@ -10,7 +10,7 @@ app = Flask(__name__)
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 
-# Initialize Roboflow model
+# Initializing Roboflow model
 rf = Roboflow(api_key="F5PelvcDYgrcgAuDsRtE")
 project = rf.workspace("primeberry").project("asabe-kqx8j")
 model = project.version("2").model
@@ -34,11 +34,11 @@ def infer():
         
         logging.debug("Image shape: %s", img.shape)
 
-        # Perform inference on the image
+        # Performing inference on the image/frame
         result = model.predict(img, confidence=50, overlap=30).json()
         logging.debug("Inference result: %s", result)
 
-        # Exclude non-serializable fields from the response
+        # Excluding non-serializable fields from the response
         serializable_result = {
             "predictions": [
                 {key: value for key, value in prediction.items() if key != "image_path"}
@@ -72,11 +72,11 @@ def infer_batch():
             
             logging.debug("Image shape: %s", img.shape)
 
-            # Perform inference on the image
+            # Performing inference on the image/frame
             result = model.predict(img, confidence=50, overlap=30).json()
             logging.debug("Inference result: %s", result)
 
-            # Exclude non-serializable fields from the response
+            # Excluding non-serializable fields from the response
             serializable_result = {
                 "predictions": [
                     {key: value for key, value in prediction.items() if key != "image_path"}
