@@ -21,7 +21,7 @@ csv_file = 'detection_results.csv'
 fieldnames = ['timestamp', 'class', 'count']
 
 # Define all possible classes
-all_classes = ['healthy', 'flowers', 'unhealthy']  # Replace with your actual class names
+all_classes = ['healthy', 'flowers', 'unhealthy']  # actual class names
 
 def init_csv():
     with open(csv_file, 'w', newline='') as file:
