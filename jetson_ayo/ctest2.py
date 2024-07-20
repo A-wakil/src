@@ -1,18 +1,23 @@
 import cv2
-import requests
 import base64
 import numpy as np
 import threading
 import queue
-import time
+import aiohttp
+import asyncio
 
-# GStreamer pipeline for capturing video from CSI camera
 pipeline = (
     "nvarguscamerasrc ! "
     "video/x-raw(memory:NVMM), width=1280, height=720, framerate=30/1 ! "
     "nvvidconv ! video/x-raw, format=BGRx ! "
     "videoconvert ! appsink"
 )
+
+async def send_frames_batch_async(frames_batch):
+    async with aiohttp.ClientSession() as session:
+        async with session.post("http://10.1.12.26:5000/infer_batch", json={"images": frames_batch}) as response:
+            result = await response.json()
+            return result
 
 def capture_frames(frame_queue):
     cap = cv2.VideoCapture(pipeline, cv2.CAP_GSTREAMER)
@@ -21,7 +26,7 @@ def capture_frames(frame_queue):
         print("Error: Unable to open camera")
         return
 
-    skip_frame = 2  # Process every 2nd frame
+    skip_frame = 2
     frame_count = 0
 
     while True:
@@ -32,76 +37,88 @@ def capture_frames(frame_queue):
 
         if frame_count % skip_frame == 0:
             if not frame_queue.full():
+                # Resize frame before adding to queue
+                frame = cv2.resize(frame, (640, 360))
                 frame_queue.put(frame)
 
         frame_count += 1
 
     cap.release()
 
-def process_frames(frame_queue):
+async def process_frames(frame_queue):
+    batch = []
+    batch_size = 5
+
     while True:
         if not frame_queue.empty():
             frame = frame_queue.get()
-            # Convert frame to base64 string
             _, buffer = cv2.imencode('.jpg', frame)
             jpg_as_text = base64.b64encode(buffer).decode('utf-8')
+            batch.append(jpg_as_text)
 
-            # Send the image to the inference server
-            response = requests.post(
-                "http://10.1.12.47:5000/infer",
-                json={"image": jpg_as_text}
-            )
-            # Print the raw response for debugging
-            print("Response Status Code:", response.status_code)
-            print("Response Text:", response.text)
+            if len(batch) >= batch_size:
+                try:
+                    result = await send_frames_batch_async(batch)
+                    # Process the results as needed
+                    for res in result:
+                        if 'predictions' in res:
+                            frame = cv2.imdecode(np.frombuffer(base64.b64decode(res['image']), np.uint8), cv2.IMREAD_COLOR)
+                            for prediction in res['predictions']:
+                                x0 = int(prediction['x'] - prediction['width'] / 2)
+                                y0 = int(prediction['y'] - prediction['height'] / 2)
+                                x1 = int(prediction['x'] + prediction['width'] / 2)
+                                y1 = int(prediction['y'] + prediction['height'] / 2)
+                                label = prediction['class']
 
+                                cv2.rectangle(frame, (x0, y0), (x1, y1), (0, 255, 0), 2)
+                                cv2.putText(frame, label, (x0, y0 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
+
+                            cv2.imshow("CSI Camera - Object Detection", frame)
+                            if cv2.waitKey(1) & 0xFF == ord('q'):
+                                break
+
+                except Exception as e:
+                    print("Error processing batch:", e)
+                finally:
+                    batch = []  # Clear batch after processing
+
+        # Handle final batch processing if queue is empty
+        if len(batch) > 0 and frame_queue.empty():
             try:
-                result = response.json()
-                print("Parsed JSON:", result)
+                result = await send_frames_batch_async(batch)
+                for res in result:
+                    if 'predictions' in res:
+                        frame = cv2.imdecode(np.frombuffer(base64.b64decode(res['image']), np.uint8), cv2.IMREAD_COLOR)
+                        for prediction in res['predictions']:
+                            x0 = int(prediction['x'] - prediction['width'] / 2)
+                            y0 = int(prediction['y'] - prediction['height'] / 2)
+                            x1 = int(prediction['x'] + prediction['width'] / 2)
+                            y1 = int(prediction['y'] + prediction['height'] / 2)
+                            label = prediction['class']
 
-                # Process the response
-                if 'predictions' in result:
-                    for prediction in result['predictions']:
-                        x0 = int(prediction['x'] - prediction['width'] / 2)
-                        y0 = int(prediction['y'] - prediction['height'] / 2)
-                        x1 = int(prediction['x'] + prediction['width'] / 2)
-                        y1 = int(prediction['y'] + prediction['height'] / 2)
-                        label = prediction['class']
+                            cv2.rectangle(frame, (x0, y0), (x1, y1), (0, 255, 0), 2)
+                            cv2.putText(frame, label, (x0, y0 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
 
-                        # Draw rectangle
-                        cv2.rectangle(frame, (x0, y0), (x1, y1), (0, 255, 0), 2)
-                        # Draw label
-                        cv2.putText(frame, label, (x0, y0 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
+                        cv2.imshow("CSI Camera - Object Detection", frame)
+                        if cv2.waitKey(1) & 0xFF == ord('q'):
+                            break
 
-                # Display the frame
-                cv2.imshow("CSI Camera - Object Detection", frame)
-
-                if cv2.waitKey(1) & 0xFF == ord('q'):
-                    break
-
-            except ValueError as e:
-                print("Error parsing JSON:", e)
-                continue
+            except Exception as e:
+                print("Error processing final batch:", e)
 
 if __name__ == "__main__":
     frame_queue = queue.Queue(maxsize=10)
 
     capture_thread = threading.Thread(target=capture_frames, args=(frame_queue,))
-    process_thread = threading.Thread(target=process_frames, args=(frame_queue,))
-
     capture_thread.start()
-    process_thread.start()
+
+    loop = asyncio.get_event_loop()
+    process_task = loop.create_task(process_frames(frame_queue))
 
     try:
-        while capture_thread.is_alive() and process_thread.is_alive():
-            time.sleep(1)
+        loop.run_forever()
     except KeyboardInterrupt:
         print("Interrupted by user, shutting down...")
-        
-# add block for logging to be parsed to JSON for writing to csv file, check which option fits best, whethe for ctest, ctest2, of inference.
-    
+
     capture_thread.join()
-    process_thread.join()
-
     cv2.destroyAllWindows()
-
