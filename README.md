@@ -17,3 +17,10 @@ Repeat all of these steps on the robot device workspace as well
 - On the computer workspace/slam_ws, run rviz `rviz2 -d src/articubot_one/config/main.rviz`
 - On the robot workspace, run `ros2 launch articubot_one rplidar.launch.py`
 - Record the map option in rviz as the robot navigates
+
+# For the Jetson Nano
+- **Configuring the camera**
+- **Building and configuring a separate and recent python version of python witthout interfering without the system version  (python3.6 for ubuntu 18)**
+- **Deploying Roboflow model to the jetson for realtime streaming and inference**
+- **Recording inference results or detections (CSV logging)**
+
